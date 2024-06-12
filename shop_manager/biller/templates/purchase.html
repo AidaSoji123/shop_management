@@ -1,0 +1,176 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+{% include "menu.html" %}
+
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Form Elements</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+          <li class="breadcrumb-item">Forms</li>
+          <li class="breadcrumb-item active">Elements</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-15">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Purchase</h5>
+              <form id="purchaseForm">
+                <div id="itemsContainer">
+                  <div class="row mb-3 item-row">
+                    <div class="col-sm-2">
+                      <label for="items" class="form-label">Items</label>
+                      <select id="items" name="items" class="form-select item-select">
+                        <option value="item1">Item 1</option>
+                        <option value="item2">Item 2</option>
+                        <option value="item3">Item 3</option>
+                        <option value="item4">Item 4</option>
+                      </select>
+                    </div>
+                    <div class="col-sm-1">
+                      <label for="quantity" class="form-label">Quantity</label>
+                      <input type="number" class="form-control item-quantity" required>
+                    </div>
+                    <div class="col-sm-1">
+                      <label for="price" class="form-label">Price</label>
+                      <input type="number" class="form-control item-price" required>
+                    </div>
+                    <div class="col-sm-1">
+                      <label for="total" class="form-label">Total</label>
+                      <input type="number" class="form-control item-total" readonly>
+                    </div>
+                    <div class="col-sm-2">
+                      <label for="inputDate" class="form-label">Date</label>
+                      <input type="date" class="form-control item-date">
+                    </div>
+                    <div class="col-sm-2">
+                      <label for="expiryDate" class="form-label">Expiry Date</label>
+                      <input type="date" class="form-control item-expiry-date">
+                    </div>
+                    <div class="col-sm-1">
+                      <label for="remove" class="form-label d-block">&nbsp;</label>
+                      <button type="button" class="btn btn-danger btn-remove">Remove</button>
+                      <i class="fas fa-trash-alt btn-remove text-danger" style="cursor: pointer;"></i>
+                    </div>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-sm-10 offset-sm-2">
+                    <button type="button" class="btn btn-secondary" id="addItemButton">Add Another Item</button>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-sm-10 offset-sm-2">
+                    <h4>Grand Total: <span id="grandTotal">0</span></h4>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-sm-10 offset-sm-2">
+                    <button type="submit" class="btn btn-primary">Submit Purchase</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+
+  {% endblock content %}
+  {% block linksBelow %}    
+     <!-- Bootstrap JS -->
+     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+     <!-- Main JS -->
+     <script>
+       function calculateFinalAmount() {
+         let grandTotal = 0;
+         document.querySelectorAll('.item-row').forEach(row => {
+           const quantity = parseFloat(row.querySelector('.item-quantity').value);
+           const price = parseFloat(row.querySelector('.item-price').value);
+           const totalField = row.querySelector('.item-total');
+     
+           if (!isNaN(quantity) && !isNaN(price)) {
+             const total = quantity * price;
+             totalField.value = total.toFixed(2);
+             grandTotal += total;
+           } else {
+             totalField.value = '0.00';
+           }
+         });
+         document.getElementById('grandTotal').innerText = grandTotal.toFixed(2);
+       }
+     
+       document.getElementById('addItemButton').addEventListener('click', () => {
+         const newItemRow = document.createElement('div');
+         newItemRow.classList.add('row', 'mb-3', 'item-row');
+         newItemRow.innerHTML = `
+           <div class="col-sm-2">
+             <select class="form-select item-select" required>
+               <option value="item1">Item 1</option>
+               <option value="item2">Item 2</option>
+               <option value="item3">Item 3</option>
+               <option value="item4">Item 4</option>
+             </select>
+           </div>
+           <div class="col-sm-1">
+             <input type="number" class="form-control item-quantity" required>
+           </div>
+           <div class="col-sm-1">
+             <input type="number" class="form-control item-price" required>
+           </div>
+           <div class="col-sm-1">
+             <input type="number" class="form-control item-total" readonly>
+           </div>
+           <div class="col-sm-2">
+             <input type="date" class="form-control item-date">
+           </div>
+           <div class="col-sm-2">
+             <input type="date" class="form-control item-expiry-date">
+           </div>
+           <div class="col-sm-1">
+             <button type="button" class="btn btn-danger btn-remove">Remove</button>
+             <i class="fas fa-trash-alt btn-remove text-danger" style="cursor: pointer;"></i>
+           </div>
+         `;
+         document.getElementById('itemsContainer').appendChild(newItemRow);
+     
+         newItemRow.querySelectorAll('.item-quantity, .item-price').forEach(input => {
+           input.addEventListener('input', calculateFinalAmount);
+         });
+     
+         newItemRow.querySelectorAll('.btn-remove').forEach(btn => {
+           btn.addEventListener('click', () => {
+             newItemRow.remove();
+             calculateFinalAmount();
+           });
+         });
+       });
+     
+       document.querySelectorAll('.item-quantity, .item-price').forEach(input => {
+         input.addEventListener('input', calculateFinalAmount);
+       });
+     
+       document.querySelectorAll('.btn-remove').forEach(btn => {
+         btn.addEventListener('click', () => {
+           btn.closest('.item-row').remove();
+           calculateFinalAmount();
+         });
+       });
+     
+       document.getElementById('purchaseForm').addEventListener('submit', function(event) {
+         event.preventDefault();
+         calculateFinalAmount();
+         alert('Form submitted successfully!');
+       });
+     </script>
+  {% endblock linksBelow %}

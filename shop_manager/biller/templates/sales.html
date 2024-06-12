@@ -1,0 +1,195 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+{% include "menu.html" %}
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Form Layouts</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+          <li class="breadcrumb-item">Forms</li>
+          <li class="breadcrumb-item active">Layouts</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+    <section class="section">
+      <div class="row">
+          <div class="col-lg-15">
+              <div class="card">
+                  <div class="card-body">
+                      <h5 class="card-title">Sales</h5>
+    
+                      <!-- Sales Form -->
+                      <form id="salesForm">
+                          <div class="row mb-3">
+                              <label for="customerName" class="col-sm-2 col-form-label">Customer Name</label>
+                              <div class="col-sm-10">
+                                  <input type="text" class="form-control" id="customerName" required>
+                              </div>
+                          </div>
+                          <div class="row mb-3">
+                              <label for="phoneNo" class="col-sm-2 col-form-label">Phone No</label>
+                              <div class="col-sm-10">
+                                  <input type="tel" class="form-control" id="phoneNo" required>
+                              </div>
+                          </div>
+                          <div id="itemsContainer">
+                              <div class="row mb-3 item-row">
+                                  <div class="col-sm-2">
+                                      <label for="items" class="form-label">Items</label>
+                                      <select class="form-select item-select" required>
+                                          <option value="item1">Item 1</option>
+                                          <option value="item2">Item 2</option>
+                                          <option value="item3">Item 3</option>
+                                          <option value="item4">Item 4</option>
+                                      </select>
+                                  </div>
+                                  <div class="col-sm-2">
+                                      <label for="quantity" class="form-label">Quantity</label>
+                                      <input type="number" class="form-control item-quantity" required>
+                                  </div>
+                                  <div class="col-sm-2">
+                                      <label for="price" class="form-label">Price</label>
+                                      <input type="number" class="form-control item-price" required>
+                                  </div>
+                                  <div class="col-sm-2">
+                                      <label for="discount" class="form-label">Discount (%)</label>
+                                      <input type="number" class="form-control item-discount" required>
+                                  </div>
+                                  <div class="col-sm-2">
+                                      <label for="total" class="form-label">Total</label>
+                                      <input type="number" class="form-control item-total" readonly>
+                                  </div>
+                                  <div class="col-sm-1">
+                                    <label for="remove" class="form-label d-block">&nbsp;</label>
+                                    <button type="button" class="btn btn-danger btn-remove">Remove</button>
+                                    <i class="fas fa-trash-alt btn-remove text-danger" style="cursor: pointer;"></i>
+                                  </div>
+                                  <div class="col-sm-3">
+                                    <label for="Additem" class="form-label d-block">&nbsp;</label>
+                                        <button type="button" class="btn btn-success" id="addItemButton">AddItem</button>
+                                    </div>
+                                  <div class="col-sm-2">
+                                      <label for="remove" class="form-label d-block">&nbsp;</label>
+                                      <i class="fas fa-trash-alt btn-remove text-danger" style="cursor: pointer;"></i>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="row mb-3">
+                              <div class="text-left">
+                                  <div class="form-check">
+                                      <input class="form-check-input" type="checkbox" id="orderComplete">
+                                      <label class="form-check-label" for="orderComplete">
+                                          Order Complete
+                                      </label>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="text-left">
+                              <button type="submit" class="btn btn-primary">Submit</button>
+                              <button type="reset" class="btn btn-secondary">Reset</button>
+                          </div>
+                          <div class="row mb-3 mt-3">
+                              <div class="col-sm-10 offset-sm-2">
+                                  <h4>Final Amount: <span id="finalAmount">0</span></h4>
+                              </div>
+                          </div>
+                      </form><!-- End Sales Form -->
+    
+                  </div>
+              </div>
+          </div>
+      </div>
+    </section>
+    
+    
+    
+   {% endblock content%}
+   {% block linksBelow %}    
+ <!-- Bootstrap JS -->
+ <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+ <!-- Main JS -->
+ <script>
+     function calculateFinalAmount() {
+         let finalAmount = 0;
+         document.querySelectorAll('.item-row').forEach(row => {
+             const quantity = parseFloat(row.querySelector('.item-quantity').value);
+             const price = parseFloat(row.querySelector('.item-price').value);
+             const discount = parseFloat(row.querySelector('.item-discount').value);
+             const totalField = row.querySelector('.item-total');
+ 
+             if (!isNaN(quantity) && !isNaN(price) && !isNaN(discount)) {
+                 const total = quantity * price * ((100 - discount) / 100);
+                 totalField.value = total.toFixed(2);
+                 finalAmount += total;
+             } else {
+                 totalField.value = '0.00';
+             }
+         });
+         document.getElementById('finalAmount').innerText = finalAmount.toFixed(2);
+     }
+ 
+     function addRemoveButtonListener(button) {
+         button.addEventListener('click', function() {
+             this.closest('.item-row').remove();
+             calculateFinalAmount();
+         });
+     }
+ 
+     document.getElementById('addItemButton').addEventListener('click', () => {
+         const newItemRow = document.createElement('div');
+         newItemRow.classList.add('row', 'mb-3', 'item-row');
+         newItemRow.innerHTML = `
+             <div class="col-sm-2">
+                 <select class="form-select item-select" required>
+                     <option value="item1">Item 1</option>
+                     <option value="item2">Item 2</option>
+                     <option value="item3">Item 3</option>
+                     <option value="item4">Item 4</option>
+                 </select>
+             </div>
+             <div class="col-sm-2">
+                 <input type="number" class="form-control item-quantity" required>
+             </div>
+             <div class="col-sm-2">
+                 <input type="number" class="form-control item-price" required>
+             </div>
+             <div class="col-sm-2">
+                 <input type="number" class="form-control item-discount" required>
+             </div>
+             <div class="col-sm-2">
+                 <input type="number" class="form-control item-total" readonly>
+             </div>
+             <div class="col-sm-2">
+                 <i class="fas fa-trash-alt btn-remove text-danger" style="cursor: pointer;"></i>
+             </div>
+         `;
+         document.getElementById('itemsContainer').appendChild(newItemRow);
+ 
+         newItemRow.querySelectorAll('.item-quantity, .item-price, .item-discount').forEach(input => {
+             input.addEventListener('input', calculateFinalAmount);
+         });
+ 
+         addRemoveButtonListener(newItemRow.querySelector('.btn-remove'));
+     });
+ 
+     document.querySelectorAll('.item-quantity, .item-price, .item-discount').forEach(input => {
+         input.addEventListener('input', calculateFinalAmount);
+     });
+ 
+     document.querySelectorAll('.btn-remove').forEach(button => {
+         addRemoveButtonListener(button);
+     });
+ 
+     document.getElementById('salesForm').addEventListener('submit', function(event) {
+         event.preventDefault();
+         calculateFinalAmount();
+         alert('Form submitted successfully!');
+     });
+ </script>
+   {% endblock linksBelow %}

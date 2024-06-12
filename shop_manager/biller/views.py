@@ -5,3 +5,12 @@ def register(request):
 
 def login_view(request):
     return render(request, 'login.html')
+
+def home(request):
+    return render(request, 'index.html')
+
+def sales(request):
+    return render(request, 'sales.html')
+
+def purchase(request):
+    return render(request, 'purchase.html')
