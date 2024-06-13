@@ -1,195 +1,296 @@
-
 {% extends "base.html" %}
 {% load static %}
+    
+{% block style %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+    }
+
+    .container {
+        width: 90%;
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #fff;
+    }
+
+    h1 {
+        text-align: center;
+    }
+
+    .header,
+    .supplier,
+    .invoice-details,
+    .footer {
+        margin-bottom: 20px;
+    }
+
+    .header,
+    .supplier {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .header > div,
+    .supplier > div {
+        flex: 1;
+        min-width: 200px;
+        margin-bottom: 10px;
+    }
+
+    label {
+        display: inline-block;
+        width: 100px;
+        margin-right: 10px;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    select {
+        width: calc(100% - 120px);
+        padding: 5px;
+        margin-bottom: 10px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    table, th, td {
+        border: 1px solid #ddd;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    input[type="number"],
+    input[type="text"] {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    button {
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #45a049;
+    }
+
+    .total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .total label {
+        width: auto;
+        margin-right: 10px;
+    }
+
+    .total input {
+        width: 200px;
+        padding: 5px;
+    }
+
+    @media (max-width: 768px) {
+        .header,
+        .supplier {
+            flex-direction: column;
+        }
+
+        .header > div,
+        .supplier > div {
+            min-width: 100%;
+        }
+
+        label {
+            width: auto;
+            margin-right: 0;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        select {
+            width: 100%;
+        }
+
+        .total {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .total input {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        th, td {
+            font-size: 12px;
+            padding: 5px;
+        }
+    }
+</style>
+{% endblock style %}
 
 {% block content %}
 
-{% include "menu.html" %}
-  <main id="main" class="main">
+<div class="container">
+    <h1>Sales Invoice</h1>
+    <div class="header">
+        <div class="left">
+            <label for="invoiceNo">Invoice No:</label>
+            <input type="text" id="invoiceNo" value="873">
+        </div>
+        <div class="right">
+            <label for="date">Date:</label>
+            <input type="date" id="date" value="2024-06-12">
+        </div>
+    </div>
+    <div class="supplier">
+        <div>
+            <label for="supplier">Supplier:</label>
+            <select id="supplier">
+                <option value="">SELECT</option>
+                <!-- Add more options here -->
+            </select>
+        </div>
+        <div>
+            <label for="supName">Sup Name:</label>
+            <input type="text" id="supName" value="0.00">
+        </div>
+    </div>
+    <div class="invoice-details">
+        <table>
+            <thead>
+                <tr>
+                    <th>SlNo</th>
+                    <th>ProductCode</th>
+                    <th>ProductName</th>
+                    <th>Unit</th>
+                    <th>Pack</th>
+                    <th>Qty</th>
+                    <th>Rate</th>
+                    <th>Amount</th>
+                    <th>Discount</th>
+                    <th>Net Amt</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="invoiceTable">
+                <tr>
+                    <td>1</td>
+                    <td><input type="text" name="productCode"></td>
+                    <td><input type="text" name="productName"></td>
+                    <td><input type="text" name="unit"></td>
+                    <td><input type="text" name="pack"></td>
+                    <td><input type="number" name="qty" oninput="calculateRow(this)"></td>
+                    <td><input type="number" name="rate" value="2" oninput="calculateRow(this)"></td>
+                    <td><input type="number" name="amount" readonly></td>
+                    <td><input type="number" name="discount" oninput="calculateRow(this)"></td>
+                    <td><input type="number" name="netAmt" readonly></td>
+                    <td><button onclick="removeRow(this)">Remove</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="footer">
+        <button onclick="addRow()">Add Row</button>
+        <div class="total">
+            <div>
+                <label for="grandTotal">GRAND TOTAL:</label>
+                <input type="number" id="grandTotal" value="0.00" readonly>
+            </div>
+            <button onclick="submitInvoice()">Submit</button>
+        </div>
+    </div>
+</div>
 
-    <div class="pagetitle">
-      <h1>Form Layouts</h1>
-      <nav>
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-          <li class="breadcrumb-item">Forms</li>
-          <li class="breadcrumb-item active">Layouts</li>
-        </ol>
-      </nav>
-    </div><!-- End Page Title -->
-    <section class="section">
-      <div class="row">
-          <div class="col-lg-15">
-              <div class="card">
-                  <div class="card-body">
-                      <h5 class="card-title">Sales</h5>
-    
-                      <!-- Sales Form -->
-                      <form id="salesForm">
-                          <div class="row mb-3">
-                              <label for="customerName" class="col-sm-2 col-form-label">Customer Name</label>
-                              <div class="col-sm-10">
-                                  <input type="text" class="form-control" id="customerName" required>
-                              </div>
-                          </div>
-                          <div class="row mb-3">
-                              <label for="phoneNo" class="col-sm-2 col-form-label">Phone No</label>
-                              <div class="col-sm-10">
-                                  <input type="tel" class="form-control" id="phoneNo" required>
-                              </div>
-                          </div>
-                          <div id="itemsContainer">
-                              <div class="row mb-3 item-row">
-                                  <div class="col-sm-2">
-                                      <label for="items" class="form-label">Items</label>
-                                      <select class="form-select item-select" required>
-                                          <option value="item1">Item 1</option>
-                                          <option value="item2">Item 2</option>
-                                          <option value="item3">Item 3</option>
-                                          <option value="item4">Item 4</option>
-                                      </select>
-                                  </div>
-                                  <div class="col-sm-2">
-                                      <label for="quantity" class="form-label">Quantity</label>
-                                      <input type="number" class="form-control item-quantity" required>
-                                  </div>
-                                  <div class="col-sm-2">
-                                      <label for="price" class="form-label">Price</label>
-                                      <input type="number" class="form-control item-price" required>
-                                  </div>
-                                  <div class="col-sm-2">
-                                      <label for="discount" class="form-label">Discount (%)</label>
-                                      <input type="number" class="form-control item-discount" required>
-                                  </div>
-                                  <div class="col-sm-2">
-                                      <label for="total" class="form-label">Total</label>
-                                      <input type="number" class="form-control item-total" readonly>
-                                  </div>
-                                  <div class="col-sm-1">
-                                    <label for="remove" class="form-label d-block">&nbsp;</label>
-                                    <button type="button" class="btn btn-danger btn-remove">Remove</button>
-                                    <i class="fas fa-trash-alt btn-remove text-danger" style="cursor: pointer;"></i>
-                                  </div>
-                                  <div class="col-sm-3">
-                                    <label for="Additem" class="form-label d-block">&nbsp;</label>
-                                        <button type="button" class="btn btn-success" id="addItemButton">AddItem</button>
-                                    </div>
-                                  <div class="col-sm-2">
-                                      <label for="remove" class="form-label d-block">&nbsp;</label>
-                                      <i class="fas fa-trash-alt btn-remove text-danger" style="cursor: pointer;"></i>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="row mb-3">
-                              <div class="text-left">
-                                  <div class="form-check">
-                                      <input class="form-check-input" type="checkbox" id="orderComplete">
-                                      <label class="form-check-label" for="orderComplete">
-                                          Order Complete
-                                      </label>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="text-left">
-                              <button type="submit" class="btn btn-primary">Submit</button>
-                              <button type="reset" class="btn btn-secondary">Reset</button>
-                          </div>
-                          <div class="row mb-3 mt-3">
-                              <div class="col-sm-10 offset-sm-2">
-                                  <h4>Final Amount: <span id="finalAmount">0</span></h4>
-                              </div>
-                          </div>
-                      </form><!-- End Sales Form -->
-    
-                  </div>
-              </div>
-          </div>
-      </div>
-    </section>
-    
-    
-    
-   {% endblock content%}
-   {% block linksBelow %}    
- <!-- Bootstrap JS -->
- <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
- <!-- Main JS -->
- <script>
-     function calculateFinalAmount() {
-         let finalAmount = 0;
-         document.querySelectorAll('.item-row').forEach(row => {
-             const quantity = parseFloat(row.querySelector('.item-quantity').value);
-             const price = parseFloat(row.querySelector('.item-price').value);
-             const discount = parseFloat(row.querySelector('.item-discount').value);
-             const totalField = row.querySelector('.item-total');
- 
-             if (!isNaN(quantity) && !isNaN(price) && !isNaN(discount)) {
-                 const total = quantity * price * ((100 - discount) / 100);
-                 totalField.value = total.toFixed(2);
-                 finalAmount += total;
-             } else {
-                 totalField.value = '0.00';
-             }
-         });
-         document.getElementById('finalAmount').innerText = finalAmount.toFixed(2);
-     }
- 
-     function addRemoveButtonListener(button) {
-         button.addEventListener('click', function() {
-             this.closest('.item-row').remove();
-             calculateFinalAmount();
-         });
-     }
- 
-     document.getElementById('addItemButton').addEventListener('click', () => {
-         const newItemRow = document.createElement('div');
-         newItemRow.classList.add('row', 'mb-3', 'item-row');
-         newItemRow.innerHTML = `
-             <div class="col-sm-2">
-                 <select class="form-select item-select" required>
-                     <option value="item1">Item 1</option>
-                     <option value="item2">Item 2</option>
-                     <option value="item3">Item 3</option>
-                     <option value="item4">Item 4</option>
-                 </select>
-             </div>
-             <div class="col-sm-2">
-                 <input type="number" class="form-control item-quantity" required>
-             </div>
-             <div class="col-sm-2">
-                 <input type="number" class="form-control item-price" required>
-             </div>
-             <div class="col-sm-2">
-                 <input type="number" class="form-control item-discount" required>
-             </div>
-             <div class="col-sm-2">
-                 <input type="number" class="form-control item-total" readonly>
-             </div>
-             <div class="col-sm-2">
-                 <i class="fas fa-trash-alt btn-remove text-danger" style="cursor: pointer;"></i>
-             </div>
-         `;
-         document.getElementById('itemsContainer').appendChild(newItemRow);
- 
-         newItemRow.querySelectorAll('.item-quantity, .item-price, .item-discount').forEach(input => {
-             input.addEventListener('input', calculateFinalAmount);
-         });
- 
-         addRemoveButtonListener(newItemRow.querySelector('.btn-remove'));
-     });
- 
-     document.querySelectorAll('.item-quantity, .item-price, .item-discount').forEach(input => {
-         input.addEventListener('input', calculateFinalAmount);
-     });
- 
-     document.querySelectorAll('.btn-remove').forEach(button => {
-         addRemoveButtonListener(button);
-     });
- 
-     document.getElementById('salesForm').addEventListener('submit', function(event) {
-         event.preventDefault();
-         calculateFinalAmount();
-         alert('Form submitted successfully!');
-     });
- </script>
-   {% endblock linksBelow %}
+<script>
+    function addRow() {
+        const table = document.getElementById('invoiceTable');
+        const rowCount = table.rows.length;
+        const row = table.insertRow(rowCount);
+
+        const cell1 = row.insertCell(0);
+        const cell2 = row.insertCell(1);
+        const cell3 = row.insertCell(2);
+        const cell4 = row.insertCell(3);
+        const cell5 = row.insertCell(4);
+        const cell6 = row.insertCell(5);
+        const cell7 = row.insertCell(6);
+        const cell8 = row.insertCell(7);
+        const cell9 = row.insertCell(8);
+        const cell10 = row.insertCell(9);
+        const cell11 = row.insertCell(10);
+
+        cell1.innerHTML = rowCount + 1;
+        cell2.innerHTML = '<input type="text" name="productCode">';
+        cell3.innerHTML = '<input type="text" name="productName">';
+        cell4.innerHTML = '<input type="text" name="unit">';
+        cell5.innerHTML = '<input type="text" name="pack">';
+        cell6.innerHTML = '<input type="number" name="qty" oninput="calculateRow(this)">';
+        cell7.innerHTML = '<input type="number" name="rate" oninput="calculateRow(this)">';
+        cell8.innerHTML = '<input type="number" name="amount" readonly>';
+        cell9.innerHTML = '<input type="number" name="discount" oninput="calculateRow(this)">';
+        cell10.innerHTML = '<input type="number" name="netAmt" readonly>';
+        cell11.innerHTML = '<button onclick="removeRow(this)">Remove</button>';
+    }
+
+    function removeRow(button) {
+        const row = button.parentElement.parentElement;
+        row.remove();
+        calculateGrandTotal();
+    }
+
+    function calculateRow(input) {
+        const row = input.parentElement.parentElement;
+        const qty = parseFloat(row.querySelector('input[name="qty"]').value) || 0;
+        const rate = parseFloat(row.querySelector('input[name="rate"]').value) || 0;
+        const discount = parseFloat(row.querySelector('input[name="discount"]').value) || 0;
+
+        const amount = qty * rate;
+        const netAmt = amount - discount;
+
+        row.querySelector('input[name="amount"]').value = amount.toFixed(2);
+        row.querySelector('input[name="netAmt"]').value = netAmt.toFixed(2);
+
+        calculateGrandTotal();
+    }
+
+    function calculateGrandTotal() {
+        const table = document.getElementById('invoiceTable');
+        let grandTotal = 0;
+
+        for (let i = 0; i < table.rows.length; i++) {
+            const netAmt = parseFloat(table.rows[i].querySelector('input[name="netAmt"]').value) || 0;
+            grandTotal += netAmt;
+        }
+
+        document.getElementById('grandTotal').value = grandTotal.toFixed(2);
+    }
+
+    function submitInvoice() {
+        // Your form submission logic here
+        alert("Invoice submitted!");
+    }
+</script>
+{% endblock content %}
